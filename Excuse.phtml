@@ -1,0 +1,36 @@
+<?php
+	// $_POST['scenario'];
+	require('Excuse.php');
+	//instantiate
+	$scenario = $_POST['scenario'];
+	$excuse = new Excuse_Generator();
+	$ping = $excuse->generateExcuse($scenario);
+	echo $ping;
+
+?>
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Excuse Generator</title>
+</head>
+<body>
+<h1>
+	This is my pong test!
+</h1>
+<h1>
+	So what's your scenario?
+</h1>
+	<form method="post" action"get_excuse.php">
+		<input type="text" name="scenario">
+		<button type="submit">
+			So?
+		</button>
+	</form>
+</body>
+</html>
