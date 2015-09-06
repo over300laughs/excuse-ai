@@ -1,18 +1,11 @@
 <?php
-	// $_POST['scenario'];
 	require('Excuse.php');
 	//instantiate
 	$scenario = $_POST['scenario'];
 	$excuse = new Excuse_Generator();
 	$ping = $excuse->generateExcuse($scenario);
-	echo $ping;
 
 ?>
-
-
-
-
-
 
 <!DOCTYPE html>
 <html>
@@ -21,7 +14,7 @@
 </head>
 <body>
 <h1>
-	This is my pong test!
+	This is my test <?php echo $ping; ?>!
 </h1>
 <h1>
 	So what's your scenario?

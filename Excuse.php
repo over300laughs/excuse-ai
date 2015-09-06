@@ -14,9 +14,10 @@ class Excuse_Generator {
 		$scenario = strtolower($scenario);
 		$person = self::find_person($scenario);
 		$subject = self::find_subject($scenario);
-		echo $subject;
-		exit;
-
+		if($subject !== false && $person['person'] !== false) {
+			$response = create_response($person, $subject);
+		}
+		return $person;
 	}
 
 	function find_person($scenario) {
@@ -55,17 +56,14 @@ class Excuse_Generator {
 				if($scen_ex[0] == "my" || $scen_ex[0] == "to")
 					$directed_person = $scen_ex[1];
 
-				return $directed_person;
+				return array('pronoun' => false, 'person' => $directed_person);
  			}
 		}
 
 		//someone was likely not mentioned so check for pronouns
 		$pronouns = array(
-			"he",
-			"she",
 			"him",
 			"her",
-			"they",
 			"them",
 		);
 
@@ -73,7 +71,7 @@ class Excuse_Generator {
 
 		foreach($scen_ex as $word) {
 			if(in_array($word, $pronouns)){
-				return $word;
+				return array('pronoun' => true, "person" => $word);
 			}
  		}
 
@@ -81,7 +79,7 @@ class Excuse_Generator {
  		// double check with metaphone
 
  		//let's assume they didn't refer to anyone
- 		return false;
+ 		return array('pronoun' => false, "person" => false);
 	}
 
 	function find_subject($scenario) {
@@ -90,35 +88,42 @@ class Excuse_Generator {
 			"going to ",
 			"late for ",
 			"asking me on ",
-			"asking me for ",
+			// "asking me for ",
 			"asking me to attend ",
 			"get out of ",
 			"avoid ",
+			"go on ",
 		);
+		
 		$construct_found = array();
 		foreach($english_constructs as $construct) {
 			if(strpos($scenario, $construct) !== false){
 				$construct_found[] = $construct;
-				break 2; //break to improve performance
+				break; //break to improve performance
 				//TODO bring in second foreach for performance
 			}
 		}
-		if(!empty($construct_found)) {
+		if(!empty($construct_found[0])) {
 			foreach($construct_found as $constrct) {
+				$test_var = "made it here ";
 				$position = strpos($scenario, $constrct);
 				$position += strlen($constrct);
 				$clip = substr($scenario, $position);
 				$scen_ex = explode(" ", $clip);
-
 				//likely at the end of the sentence
-				//has room for one adjective
 				$prep_words = array(
 					"a",
 					"an",
 					"the",
+					"my",
 				); 
-				if(in_array($prep_words, $scen_ex) && count($scen_ex) <= 1) {
+
+				if(in_array($scen_ex[0], $prep_words) && count($scen_ex) <= 2) {
 					$subject = $scen_ex[1];
+					return $subject;
+				}
+				else if(count($scen_ex) <= 2) {
+					$subject = $scen_ex[0];
 					return $subject;
 				}
  			}
@@ -126,6 +131,49 @@ class Excuse_Generator {
  		return false;
 	}
 
+	function create_response($person, $subject) {
+		$segway = create_segway($person);
+		$subject_phrase = mk_subj_phrase($subject);
+	}
+
+	function create_segway($person) {
+		if($person['pronoun'] === true) {
+			//List out pronouns
+			$pronoun_phrases = array(
+				'I would tell ',
+				'Just tell',
+				'Try telling ',
+				'Tell ',
+				'I would just say to ',
+			);
+			//grammatically deal with a pronoun
+			$generate = rand(0, 4);
+			$segway = $pronoun_phrases[$generate] . ' ' . $person  .  ' ';
+			return $segway;
+		}
+		else if($person['person'] === true){
+			$segways = array(
+				'I would just explain to this ',
+				'Just tell your ',
+				'Maybe tell your ',
+				'I would just tell your ',
+			);
+			$generate = rand(0, 3);
+			$segway = $pronoun_phrases[$generate];
+			if($generate === 0) {
+				$segway = $segways[0] . $person['person'] . ' of yours ';
+			}
+			else {
+				$segway = $segways[0] . $person['person'] . ' ';
+			}
+			return $segway;
+		}
+		return false;
+	}
+
+	function mk_subj_phrase() {
+		
+	}
 
 	public $exc1 = "Just say traffic was terrible.";
 	public $exc2 = "Just say your arm cramped up.";
