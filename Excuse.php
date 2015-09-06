@@ -172,7 +172,13 @@ class Excuse_Generator {
 	}
 
 	function mk_subj_phrase() {
-		
+		$thorax = array(
+			'that ',
+			'',
+			'',
+			'',
+			'',
+		);
 	}
 
 	public $exc1 = "Just say traffic was terrible.";
